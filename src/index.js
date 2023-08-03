@@ -1,6 +1,6 @@
 import {persist} from "mobx-state-tree-persist";
 
-export const persistAndSync = (arr: Parameters<typeof persist>[0]) => {
+export const persistAndSync = arr => {
 	for (const [store, {key}] of arr) {
 		//todo need to subscribe to changes of store and send to server
 		//todo need to subscribe to change from server and update store
