@@ -5,3 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      patterns:
+      - "*"
+      update-types:
+      - "minor"
+      - "patch"
