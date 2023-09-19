@@ -11,7 +11,7 @@
 		"format": "npx prettier --write ."
 	},
 	"dependencies": {
-		"mobx-state-tree": "^5.1.8",
+		"mobx-state-tree": "^5.2.0",
 		"mobx-state-tree-persist": "^0.2.0"
 	},
 	"devDependencies": {
