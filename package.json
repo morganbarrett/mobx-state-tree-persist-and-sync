@@ -1,9 +1,9 @@
 {
-	"name": "mobx-state-tree-persist-and-sync",
+	"name": "mobx-state-tree-persistence",
 	"version": "1.0.0",
 	"description": "",
 	"main": "src/index.ts",
-	"repository": "git+https://github.com/morganbarrett/mobx-state-tree-persist-and-sync.git",
+	"repository": "git+https://github.com/morganbarrett/mobx-state-tree-persistence.git",
 	"author": "Morgan Barrett <morganbarrett@icloud.com>",
 	"license": "MIT",
 	"scripts": {
@@ -11,8 +11,7 @@
 		"format": "npx prettier --write ."
 	},
 	"dependencies": {
-		"mobx-state-tree": "^5.1.8",
-		"mobx-state-tree-persist": "^0.2.0"
+		"mobx-state-tree": "^5.1.8"
 	},
 	"devDependencies": {
 		"eslint": "^8.46.0",
