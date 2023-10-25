@@ -5,22 +5,17 @@ type Storage = {
 	setItem(key: string, value: string): void;
 };
 
-type Store = IModelType<
-	{},
-	{
-		readonly isRehydrated: boolean;
-		applyUpdate(
-			store: IModelType<any, any>,
-			key: string,
-			promise: Promise<string>
-		): Promise<void>;
-	},
-	_NotCustomized,
-	_NotCustomized
->;
+type Store = {
+	readonly isRehydrated: boolean;
+	applyUpdate(
+		store: IStateTreeNode<IModelType<any>>,
+		key: string,
+		promise: Promise<string>
+	): Promise<void>;
+};
 
 export function persist(
-	rootStore: IModelType<any, any>,
+	rootStore: Record<string, IStateTreeNode<IModelType<any>>>,
 	keys: string[],
 	storage: Storage
 ): Store;
