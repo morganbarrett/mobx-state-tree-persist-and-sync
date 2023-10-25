@@ -10,16 +10,14 @@ export const persist = async ({
 	store,
 	keys,
 	storage,
-	keyMap,
+	storageDelay,
 	update,
-	updateDelay,
-	storageDelay
+	updateDelay
 }) => {
 	let queue = new Map();
 
 	await Promise.all(
-		keys.map(async rawKey => {
-			const key = keyMap ? keyMap(rawKey) : rawKey;
+		keys.map(async key => {
 			const keyStore = store[key];
 
 			if (storage?.getItem) {
