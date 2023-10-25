@@ -1,21 +1,24 @@
-import {IModelType, _NotCustomized} from "mobx-state-tree";
+import {IStateTreeNode, IModelType} from "mobx-state-tree";
 
 type Storage = {
 	getItem(key: string): Promise<string | null>;
 	setItem(key: string, value: string): void;
 };
 
-type Store = {
-	readonly isRehydrated: boolean;
-	applyUpdate(
-		store: IStateTreeNode<IModelType<any>>,
-		key: string,
-		promise: Promise<string>
-	): Promise<void>;
-};
+interface PersistProps {
+	store: IStateTreeNode<IModelType<any>>;
+	keys: string[];
+	storage?: Storage;
+	keyMap?: (key: string) => string;
+	update?: (pairs: [string, string][]) => [string, string][];
+	updateDelay?: number;
+	storageDelay?: number;
+}
 
-export function persist(
-	rootStore: Record<string, IStateTreeNode<IModelType<any>>>,
-	keys: string[],
-	storage: Storage
-): Store;
+export async function persist({
+	store,
+	keys,
+	storage,
+	keyMap,
+	update
+}: PersistProps): void;

@@ -1,58 +1,62 @@
-import {types, onSnapshot, applySnapshot} from "mobx-state-tree";
+import {onSnapshot, applySnapshot} from "mobx-state-tree";
 
-const Store = types
-	.model("MobXStateTreePersistAndSyncStore")
-	.props({
-		initialized: false,
-		rehydratedMap: types.map(types.boolean)
-	})
-	.views(self => ({
-		get isRehydrated() {
-			return (
-				self.initialized &&
-				self.rehydratedMap
-					.entries()
-					.every(([_, isRehydrated]) => isRehydrated)
-			);
-		}
-	}))
-	.actions(self => ({
-		setInitialized() {
-			self.initialized = true;
-		},
-		async applyUpdate(store, key, promise) {
-			self.rehydratedMap.set(key, false);
-
-			const state = await promise;
-
-			if (state) {
-				applySnapshot(store[key], JSON.parse(state));
-			}
-
-			self.rehydratedMap.set(key, true);
-		}
-	}));
-
-const onStoreUpdate = async (stores, key, callback) => {
-	let timeout;
-
-	onSnapshot(stores[key], ({...state}) => {
-		clearTimeout(timeout);
-
-		timeout = setTimeout(() => callback(key, JSON.stringify(state)), 100);
-	});
+const applyUpdate = (store, state) => {
+	if (state) {
+		applySnapshot(store, JSON.parse(state));
+	}
 };
 
-export const persist = (rootStore, keys, storage) => {
-	const store = Store.create();
+export const persist = async ({
+	store,
+	keys,
+	storage,
+	keyMap,
+	update,
+	updateDelay,
+	storageDelay
+}) => {
+	let queue = [];
 
-	for (const key of keys) {
-		store.applyUpdate(rootStore, key, storage.getItem(key));
+	await Promise.all(
+		keys.map(async rawKey => {
+			const key = keyMap ? keyMap(rawKey) : rawKey;
+			const keyStore = store[key];
 
-		onStoreUpdate(rootStore, key, storage.setItem);
+			if (storage?.getItem) {
+				applyUpdate(keyStore, await storage.getItem(key));
+			}
+
+			let timeout;
+
+			onSnapshot(keyStore, ({...str}) => {
+				clearTimeout(timeout);
+
+				timeout = setTimeout(() => {
+					const state = JSON.stringify(str);
+
+					if (storage?.setItem) {
+						storage.setItem(key, state);
+					}
+
+					if (update) {
+						queue.push([key, state]);
+					}
+				}, storageDelay ?? 100);
+			});
+		})
+	);
+
+	if (update) {
+		const loop = () =>
+			setTimeout(() => {
+				const updates = update(queue);
+				queue = [];
+
+				for (const [key, state] of updates) {
+					applyUpdate(store[key], state);
+				}
+			}, updateDelay ?? 5000);
+
+		loop();
 	}
-
-	store.setInitialized();
-
-	return store;
 };
