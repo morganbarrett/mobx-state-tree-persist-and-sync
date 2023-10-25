@@ -53,7 +53,13 @@ export const persist = async ({
 				queue = new Map();
 
 				for (const [key, state] of updates) {
-					applyUpdate(store[key], state);
+					if(store[key]){
+						applyUpdate(store[key], state);
+					}
+
+					if (storage?.setItem) {
+						storage.setItem(key, state);
+					}
 				}
 			}, updateDelay ?? 5000);
 
