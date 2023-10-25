@@ -15,7 +15,7 @@ export const persist = async ({
 	updateDelay,
 	storageDelay
 }) => {
-	let queue = [];
+	let queue = new Map();
 
 	await Promise.all(
 		keys.map(async rawKey => {
@@ -39,7 +39,7 @@ export const persist = async ({
 					}
 
 					if (update) {
-						queue.push([key, state]);
+						queue.set(key, state);
 					}
 				}, storageDelay ?? 100);
 			});
@@ -49,8 +49,8 @@ export const persist = async ({
 	if (update) {
 		const loop = () =>
 			setTimeout(() => {
-				const updates = update(queue);
-				queue = [];
+				const updates = update(queue.entries());
+				queue = new Map();
 
 				for (const [key, state] of updates) {
 					applyUpdate(store[key], state);
