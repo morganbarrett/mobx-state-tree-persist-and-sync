@@ -1,5 +1,8 @@
 # `mobx-state-tree-persistence`
 
+TODO - at the moment, naively the whole stores data is sent every time there is an update, this needs to be replaced with a solution that can only send and recieve the changes within the stores.
+
+
 ```javascript
 import {observer} from "mobx-react-lite";
 import {types} from "mobx-state-tree";
