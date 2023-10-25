@@ -13,10 +13,4 @@ interface PersistProps {
 	storageDelay?: number;
 }
 
-export function persist({
-	store,
-	keys,
-	storage,
-	keyMap,
-	update
-}: PersistProps): Promise<void>;
+export function persist(props: PersistProps): Promise<void>;
