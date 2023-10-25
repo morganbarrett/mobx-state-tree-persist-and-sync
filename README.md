@@ -3,7 +3,7 @@
 ```javascript
 import {observer} from "mobx-react-lite";
 import {types} from "mobx-state-tree";
-import {persist} from "mobx-state-tree-persist-and-sync";
+import {persist} from "mobx-state-tree-persistence";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FooModel = types.model("foo").props({
@@ -14,27 +14,42 @@ const BarModel = types.model("bar").props({
 	test: false
 });
 
-const RootModel = types.model("root").props({
-	foo: FooModel,
-	bar: BarModel
-});
+const RootModel = types
+	.model("root")
+	.props({
+		isHydrated: false,
+		foo: FooModel,
+		bar: BarModel
+	})
+	.actions(self => ({
+		setHydrated() {
+			self.isHydrated = true;
+		}
+	}));
 
 const rootStore = RootModel.create({
 	foo: {},
 	bar: {}
 });
 
-const persistStore = persist(rootStore, ["foo", "bar"], AsyncStorage);
+persist({
+	store: rootStore,
+	keys: ["foo", "bar"],
+	storage: AsyncStorage,
+	update: localChanges => {
+		...
+		return remoteChanges;
+	},
+	keyMap: key => key.toLowerCase(),
+	updateDelay: 1000,
+	storageDelay: 1000
+}).then(() => rootStore.setHydrated());
 
 const App = observer(() => {
-	if (!persistStore.isRehydrated) {
+	if (!rootStore.isHydrated) {
 		return null;
 	}
 
 	return <Text>{rootStore.foo.test}</Text>;
 });
-
-onRemoteContent(data =>
-	persistStore.applyUpdate(rootStore, data.key, data.value)
-);
 ```
