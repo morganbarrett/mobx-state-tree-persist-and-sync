@@ -47,17 +47,19 @@ export const persist = async ({
 	if (update) {
 		const loop = () =>
 			setTimeout(async () => {
-				const entries = queue.entries();
+				const entries = queue
+					.entries()
+					.map(([key, value]) => ({key, value}));
 				queue = new Map();
 				const updates = await update(entries);
-				
-				for await (const [key, state] of updates) {
-					if(store[key]){
-						applyUpdate(store[key], state);
+
+				for await (const {key, value} of updates) {
+					if (store[key]) {
+						applyUpdate(store[key], value);
 					}
 
 					if (storage?.setItem) {
-						await storage.setItem(key, state);
+						await storage.setItem(key, value);
 					}
 				}
 			}, updateDelay ?? 5000);

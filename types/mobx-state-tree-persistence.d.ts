@@ -3,12 +3,17 @@ type Storage = {
 	setItem(key: string, value: string): void;
 };
 
+type KeyValue = {
+	key: string;
+	value: string;
+};
+
 interface PersistProps {
 	store: Record<string, any>;
 	keys: string[];
 	storage?: Storage;
 	storageDelay?: number;
-	update?: (pairs: [string, string][]) => Promise<[string, string][]>;
+	update?: (pairs: KeyValue[]) => Promise<KeyValue[]>;
 	updateDelay?: number;
 }
 
