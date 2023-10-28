@@ -1,12 +1,13 @@
-# `mobx-state-tree-persistence`
+# `mobx-state-tree-persist-and-sync`
 
-TODO - at the moment, naively the whole stores data is sent every time there is an update, this needs to be replaced with a solution that can only send and recieve the changes within the stores.
-
+TODO - at the moment, naively the whole stores data is sent every time there
+is an update, this needs to be replaced with a solution that can only send and
+receive the changes within the stores.
 
 ```javascript
 import {observer} from "mobx-react-lite";
 import {types} from "mobx-state-tree";
-import {persist} from "mobx-state-tree-persistence";
+import {persistAndSync} from "mobx-state-tree-persist-and-sync";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FooModel = types.model("foo").props({
@@ -35,18 +36,13 @@ const rootStore = RootModel.create({
 	bar: {}
 });
 
-persist({
-	store: rootStore,
-	keys: ["foo", "bar"],
-	storage: AsyncStorage,
-	update: localChanges => {
-		...
-		return remoteChanges;
-	},
-	keyMap: key => key.toLowerCase(),
-	updateDelay: 1000,
-	storageDelay: 1000
-}).then(() => rootStore.setHydrated());
+persistAndSync(
+	rootStore,
+	["foo"],
+	["bar"],
+	AsyncStorage,
+	syncUpdate //todo explain server side
+).then(() => rootStore.setHydrated());
 
 const App = observer(() => {
 	if (!rootStore.isHydrated) {

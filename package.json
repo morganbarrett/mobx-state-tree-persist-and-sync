@@ -1,10 +1,10 @@
 {
-	"name": "mobx-state-tree-persistence",
-	"version": "2.0.0",
+	"name": "mobx-state-tree-persist-and-sync",
+	"version": "1.0.0",
 	"description": "",
 	"main": "src/index.ts",
 	"types": "types/mobx-state-tree-persistence.d.ts",
-	"repository": "git+https://github.com/morganbarrett/mobx-state-tree-persistence.git",
+	"repository": "git+https://github.com/morganbarrett/mobx-state-tree-persist-and-sync.git",
 	"author": "Morgan Barrett <morganbarrett@icloud.com>",
 	"license": "MIT",
 	"scripts": {
