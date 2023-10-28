@@ -1,2 +1,2 @@
-export {persist} from "./persist";
+export {persistAndSync} from "./persistAndSync";
 export {update} from "./update";

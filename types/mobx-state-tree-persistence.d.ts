@@ -15,11 +15,7 @@ type Changes = {
 	lastUpdate: number;
 };
 
-interface PersistProps {
-	update?: (pairs: KeyValue[]) => Promise<KeyValue[]>;
-}
-
-export function persist(
+export function persistAndSync(
 	store: Record<string, any>,
 	persistKeys: string[],
 	syncKeys: string[],
