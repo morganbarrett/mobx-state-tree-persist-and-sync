@@ -5,7 +5,7 @@ export const update = async ({changes, lastUpdate}, storage) => {
 
 	for await (const {key, value} of changes) {
 		if (!remoteChanges.some(row => row.key == key)) {
-			await Storage.setItem(key, value);
+			await storage.setItem(key, value);
 		}
 	}
 
