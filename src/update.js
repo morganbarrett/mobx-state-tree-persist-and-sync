@@ -1,6 +1,4 @@
 export const update = async ({changes, lastUpdate}, storage) => {
-	const updatedAt = new Date();
-
 	const remoteChanges = await storage.getChanges(lastUpdate);
 
 	for await (const {key, value} of changes) {
@@ -10,7 +8,7 @@ export const update = async ({changes, lastUpdate}, storage) => {
 	}
 
 	return {
-		lastUpdate: updatedAt.getTime(),
+		lastUpdate: Date.now(),
 		changes: remoteChanges
 	};
 };
