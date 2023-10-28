@@ -1,20 +1,37 @@
-type Storage = {
+type LocalStorage = {
 	getItem(key: string): Promise<string | null>;
 	setItem(key: string, value: string): void;
 };
+
+type RemoteStorage = {};
 
 type KeyValue = {
 	key: string;
 	value: string;
 };
 
+type Changes = {
+	changes: KeyValue[];
+	lastUpdate: number;
+};
+
 interface PersistProps {
-	store: Record<string, any>;
-	keys: string[];
-	storage?: Storage;
-	storageDelay?: number;
 	update?: (pairs: KeyValue[]) => Promise<KeyValue[]>;
-	updateDelay?: number;
 }
 
-export function persist(props: PersistProps): Promise<void>;
+export function persist(
+	store: Record<string, any>,
+	persistKeys: string[],
+	syncKeys: string[],
+	storage: LocalStorage,
+	update: (data: Changes) => Promise<Changes>,
+	options?: {
+		localDelay?: number;
+		remoteDelay?: number;
+	}
+): Promise<void>;
+
+export function update(
+	data: Changes,
+	storage: RemoteStorage
+): Promise<Changes>;
