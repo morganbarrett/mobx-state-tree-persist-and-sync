@@ -1,6 +1,6 @@
 {
 	"name": "mobx-state-tree-persist-and-sync",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "",
 	"main": "src/index.ts",
 	"types": "types/mobx-state-tree-persistence.d.ts",
