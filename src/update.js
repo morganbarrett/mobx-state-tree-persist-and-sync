@@ -1,4 +1,4 @@
-export const update = async (changes, lastUpdate, storage) => {
+export const update = async ({changes, lastUpdate}, storage) => {
 	const updatedAt = new Date();
 
 	const remoteChanges = await storage.getChanges(lastUpdate);

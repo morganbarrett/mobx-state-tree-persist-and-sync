@@ -12,7 +12,7 @@ export const persistAndSync = async (
 	syncKeys,
 	storage,
 	update,
-	{localDelay, remoteDelay}
+	{localDelay, remoteDelay} = {}
 ) => {
 	const keys = [...new Set([...persistKeys, ...syncKeys])];
 	const lastUpdateStr = await storage.getItem("lastUpdate");
