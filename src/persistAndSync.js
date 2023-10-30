@@ -6,7 +6,7 @@ const applyUpdate = (store, state) => {
 	}
 };
 
-export const persistAndSync = async (
+export const persistAndSync = (
 	store,
 	persistKeys,
 	syncKeys,
@@ -15,11 +15,10 @@ export const persistAndSync = async (
 	{localDelay, remoteDelay} = {}
 ) => {
 	const keys = [...new Set([...persistKeys, ...syncKeys])];
-	const lastUpdateStr = await storage.getItem("lastUpdate");
-	let lastUpdate = Number(lastUpdateStr);
+
 	let queue = new Map();
 
-	await Promise.all(
+	const promise = Promise.all(
 		keys.map(async key => {
 			const keyStore = store[key];
 
@@ -43,25 +42,45 @@ export const persistAndSync = async (
 		})
 	);
 
-	const loop = () =>
-		setTimeout(async () => {
-			const changes = [...queue.entries()].map(([key, value]) => ({
-				key,
-				value
-			}));
-			queue = new Map();
-			let remote = await update({changes, lastUpdate});
-			lastUpdate = remote.lastUpdate;
-			storage.setItem("lastUpdate", lastUpdate.toString());
+	let cancelled = false;
 
-			for await (const {key, value} of remote.changes) {
-				if (store[key]) {
-					applyUpdate(store[key], value);
+	(async () => {
+		await promise;
+
+		let lastUpdate = Number(await storage.getItem("lastUpdate"));
+
+		const loop = () =>
+			!cancelled &&
+			setTimeout(async () => {
+				const changes = [...queue.entries()].map(([key, value]) => ({
+					key,
+					value
+				}));
+
+				queue = new Map();
+
+				let remote = await update({changes, lastUpdate});
+
+				lastUpdate = remote.lastUpdate;
+
+				storage.setItem("lastUpdate", lastUpdate.toString());
+
+				for await (const {key, value} of remote.changes) {
+					if (store[key]) {
+						applyUpdate(store[key], value);
+					}
+
+					await storage.setItem(key, value);
 				}
 
-				await storage.setItem(key, value);
-			}
-		}, remoteDelay ?? 5000);
+				loop();
+			}, remoteDelay ?? 5000);
 
-	loop();
+		loop();
+	})();
+
+	return {
+		destroy: () => (cancelled = true),
+		promise
+	};
 };
