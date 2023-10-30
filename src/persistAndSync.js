@@ -45,14 +45,16 @@ export const persistAndSync = async (
 
 	const loop = () =>
 		setTimeout(async () => {
-			const changes = [...queue.entries()]
-				.map(([key, value]) => ({key, value}));
+			const changes = [...queue.entries()].map(([key, value]) => ({
+				key,
+				value
+			}));
 			queue = new Map();
 			let remote = await update({changes, lastUpdate});
 			lastUpdate = remote.lastUpdate;
 			storage.setItem("lastUpdate", lastUpdate.toString());
 
-			for await (const {key, value} of remote.updates) {
+			for await (const {key, value} of remote.changes) {
 				if (store[key]) {
 					applyUpdate(store[key], value);
 				}
