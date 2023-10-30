@@ -25,7 +25,10 @@ export function persistAndSync(
 		localDelay?: number;
 		remoteDelay?: number;
 	}
-): Promise<void>;
+): {
+	promise: Promise<void>;
+	destroy: () => void;
+};
 
 export function update(
 	data: Changes,
