@@ -1,4 +1,9 @@
-export const update = async ({changes, lastUpdate}, storage) => {
+import {Changes, RemoteStorage} from "./types";
+
+export const update = async (
+	{changes, lastUpdate}: Changes,
+	storage: RemoteStorage
+): Promise<Changes> => {
 	const remoteChanges = await storage.getChanges(lastUpdate);
 
 	for await (const {key, value} of changes) {

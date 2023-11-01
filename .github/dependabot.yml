@@ -1,13 +1,13 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    versioning-strategy: increase
-    directory: "/"
-    schedule:
-      interval: "daily"
-    groups:
-      patterns:
-      - "*"
-      update-types:
-      - "minor"
-      - "patch"
+    - package-ecosystem: "npm"
+      versioning-strategy: increase
+      directory: "/"
+      schedule:
+          interval: "daily"
+      groups:
+          patterns:
+              - "*"
+          update-types:
+              - "minor"
+              - "patch"

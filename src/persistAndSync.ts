@@ -1,18 +1,28 @@
-import {onSnapshot, applySnapshot} from "mobx-state-tree";
+import {onSnapshot, applySnapshot, IStateTreeNode} from "mobx-state-tree";
+import {Changes, LocalStorage} from "./types";
 
-const applyUpdate = (store, state) => {
+const applyUpdate = (
+	store: IStateTreeNode,
+	state: string | undefined | null
+) => {
 	if (state) {
 		applySnapshot(store, JSON.parse(state));
 	}
 };
 
 export const persistAndSync = (
-	store,
-	persistKeys,
-	syncKeys,
-	storage,
-	update,
-	{localDelay, remoteDelay} = {}
+	store: Record<string, IStateTreeNode>,
+	persistKeys: string[],
+	syncKeys: string[],
+	storage: LocalStorage,
+	update: (data: Changes) => Promise<Changes>,
+	{
+		localDelay,
+		remoteDelay
+	}: {
+		localDelay?: number;
+		remoteDelay?: number;
+	} = {}
 ) => {
 	const keys = [...new Set([...persistKeys, ...syncKeys])];
 
@@ -25,7 +35,7 @@ export const persistAndSync = (
 
 			applyUpdate(keyStore, await storage.getItem(safeKey));
 
-			let timeout;
+			let timeout: number;
 
 			onSnapshot(keyStore, ({...str}) => {
 				clearTimeout(timeout);
@@ -60,7 +70,7 @@ export const persistAndSync = (
 
 				queue = new Map();
 
-				let remote = await update({changes, lastUpdate});
+				const remote = await update({changes, lastUpdate});
 
 				lastUpdate = remote.lastUpdate;
 
