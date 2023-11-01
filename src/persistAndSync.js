@@ -21,8 +21,9 @@ export const persistAndSync = (
 	const promise = Promise.all(
 		keys.map(async key => {
 			const keyStore = store[key];
+			const safeKey = "pas-" + key;
 
-			applyUpdate(keyStore, await storage.getItem(key));
+			applyUpdate(keyStore, await storage.getItem(safeKey));
 
 			let timeout;
 
@@ -32,10 +33,10 @@ export const persistAndSync = (
 				timeout = setTimeout(() => {
 					const state = JSON.stringify(str);
 
-					storage.setItem(key, state);
+					storage.setItem(safeKey, state);
 
 					if (syncKeys.includes(key)) {
-						queue.set(key, state);
+						queue.set(safeKey, state);
 					}
 				}, localDelay ?? 100);
 			});
@@ -47,7 +48,7 @@ export const persistAndSync = (
 	(async () => {
 		await promise;
 
-		let lastUpdate = Number(await storage.getItem("lastUpdate"));
+		let lastUpdate = Number(await storage.getItem("last-update"));
 
 		const loop = () =>
 			!cancelled &&
@@ -63,11 +64,13 @@ export const persistAndSync = (
 
 				lastUpdate = remote.lastUpdate;
 
-				storage.setItem("lastUpdate", lastUpdate.toString());
+				storage.setItem("last-update", lastUpdate.toString());
 
 				for await (const {key, value} of remote.changes) {
-					if (store[key]) {
-						applyUpdate(store[key], value);
+					const realKey = key.slice(4);
+
+					if (store[realKey]) {
+						applyUpdate(store[realKey], value);
 					}
 
 					await storage.setItem(key, value);
