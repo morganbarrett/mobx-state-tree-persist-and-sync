@@ -11,7 +11,7 @@ const applyUpdate = (
 };
 
 export const persistAndSync = (
-	store: Record<string, IStateTreeNode>,
+	store: IStateTreeNode,
 	persistKeys: string[],
 	syncKeys: string[],
 	storage: LocalStorage,
@@ -28,10 +28,12 @@ export const persistAndSync = (
 
 	let queue = new Map();
 
+	const recordStore = store as Record<string, IStateTreeNode>;
+
 	const promise = Promise.all(
 		keys.map(async key => {
-			const keyStore = store[key];
-			const safeKey = "pas-" + key;
+			const keyStore = recordStore[key];
+			const safeKey = "mxstpas-" + key;
 
 			applyUpdate(keyStore, await storage.getItem(safeKey));
 
@@ -79,8 +81,8 @@ export const persistAndSync = (
 				for await (const {key, value} of remote.changes) {
 					const realKey = key.slice(4);
 
-					if (store[realKey]) {
-						applyUpdate(store[realKey], value);
+					if (recordStore[realKey]) {
+						applyUpdate(recordStore[realKey], value);
 					}
 
 					await storage.setItem(key, value);
