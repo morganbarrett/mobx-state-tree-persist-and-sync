@@ -62,34 +62,34 @@ export const persistAndSync = (
 
 		let lastUpdate = Number(await storage.getItem("last-update"));
 
-		const loop = () =>
-			!cancelled &&
-			setTimeout(async () => {
-				const changes = [...queue.entries()].map(([key, value]) => ({
-					key,
-					value
-				}));
+		const loop = async () => {
+			if (cancelled) return;
 
-				queue = new Map();
+			const changes = [...queue.entries()].map(([key, value]) => ({
+				key,
+				value
+			}));
 
-				const remote = await update({changes, lastUpdate});
+			queue = new Map();
 
-				lastUpdate = remote.lastUpdate;
+			const remote = await update({changes, lastUpdate});
 
-				storage.setItem("last-update", lastUpdate.toString());
+			lastUpdate = remote.lastUpdate;
 
-				for await (const {key, value} of remote.changes) {
-					const realKey = key.slice(4);
+			storage.setItem("last-update", lastUpdate.toString());
 
-					if (recordStore[realKey]) {
-						applyUpdate(recordStore[realKey], value);
-					}
+			for await (const {key, value} of remote.changes) {
+				const realKey = key.slice(4);
 
-					await storage.setItem(key, value);
+				if (recordStore[realKey]) {
+					applyUpdate(recordStore[realKey], value);
 				}
 
-				loop();
-			}, remoteDelay ?? 5000);
+				await storage.setItem(key, value);
+			}
+
+			setTimeout(loop, remoteDelay ?? 5000);
+		};
 
 		loop();
 	})();
