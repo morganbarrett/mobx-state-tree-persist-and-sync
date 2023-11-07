@@ -78,15 +78,17 @@ export const persistAndSync = (
 
 			storage.setItem("last-update", lastUpdate.toString());
 
-			for await (const {key, value} of remote.changes) {
-				const realKey = key.slice(4);
+			await Promise.all(
+				remote.changes.map(async ({key, value}) => {
+					const realKey = key.slice(4);
 
-				if (recordStore[realKey]) {
-					applyUpdate(recordStore[realKey], value);
-				}
+					if (recordStore[realKey]) {
+						applyUpdate(recordStore[realKey], value);
+					}
 
-				await storage.setItem(key, value);
-			}
+					await storage.setItem(key, value);
+				})
+			);
 
 			setTimeout(loop, remoteDelay ?? 5000);
 		};
