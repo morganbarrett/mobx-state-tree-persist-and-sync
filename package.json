@@ -27,12 +27,5 @@
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
-	},
-	"hooks": {
-		"before:init": [
-			"yarn lint",
-			"yarn format",
-			"tsc"
-		]
 	}
 }
